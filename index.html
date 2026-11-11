@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>مواجهة الفجر — أنميشن قتالي مدته دقيقتان</title>
+<meta name="description" content="مقطع أنمي قتالي مدته 120 ثانية يُرسم لحظياً داخل المتصفح: ضربات، هجمات طاقة، إطارات تأثير وضربة أخيرة، مع صوت مولّد بالكود.">
+<meta name="theme-color" content="#060A18">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23060A18'/%3E%3Cpath d='M40 10 L24 34 h11 L22 54 L48 26 H36 Z' fill='%2300E1FF'/%3E%3Ccircle cx='46' cy='46' r='5' fill='%23FF2E88'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700;800&family=Reem+Kufi:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ============================ شاشة البداية ============================ -->
+<main class="view" id="view-start">
+  <div class="wrap">
+    <div class="bar">
+      <span>ANIME FIGHT · REAL-TIME RENDER · ١٢٠ ثانية</span>
+      <span class="pill">٢:٠٠ · ٦٠FPS</span>
+    </div>
+
+    <span class="eyebrow">دقيقتان بالضبط</span>
+    <h1 class="title">مواجهة الفجر</h1>
+    <p class="lead">مقطع قتالي كامل داخل المتصفح: ضربات، اندفاع، هجمات طاقة، إطارات تأثير، وضربة أخيرة تحسم كل شيء. كل شيء مرسوم بالكود لحظة بلحظة — بلا فيديو ولا صور جاهزة.</p>
+
+    <div class="duel">
+      <div class="card"><div class="ava">ر</div><b>رين</b><small>سيّاف الرياح · برق أزرق</small></div>
+      <div class="vs"><span>ضد</span></div>
+      <div class="card b"><div class="ava">ك</div><b>كورو</b><small>سيّد الرماد · لهب أسود</small></div>
+    </div>
+
+    <div class="play">
+      <button class="btn" id="btn_start">▶ ابدأ المواجهة</button>
+      <button class="btn ghost" id="btn_sound" aria-pressed="true">🔊 الصوت مفعّل</button>
+    </div>
+
+    <div class="hud">
+      <div class="track"><i id="fill"></i></div>
+      <div class="ticks"><span>٠:٠٠</span><span>٠:٣٠</span><span>١:٠٠</span><span>١:٣٠</span><span>٢:٠٠</span></div>
+      <div class="controls">
+        <button class="chip solid" id="btn_pause">⏸ إيقاف مؤقت</button>
+        <button class="chip" id="btn_replay">↺ إعادة</button>
+        <button class="chip" id="btn_full">⛶ ملء الشاشة</button>
+        <button class="chip" id="btn_mute">🔇 كتم</button>
+      </div>
+    </div>
+
+    <ul class="phases">
+      <li><b>٠:٠٠ · هدوء</b>ثِقل في الهواء قبل الضربة الأولى</li>
+      <li><b>٠:٢٠ · اشتباك</b>تبادل سريع وسيوف تتقاطع</li>
+      <li><b>٠:٤٥ · تصعيد</b>هجمات طاقة تتشكّل في الهواء</li>
+      <li><b>١:٠٥ · ذروة</b>انفجارات وقفزات في السماء</li>
+      <li><b>١:٣٠ · بطيء</b>لحظة حرجة بسرعة ٠.٣×</li>
+      <li><b>١:٤٨ · الحسم</b>الضربة النهائية ثم السكون</li>
+    </ul>
+
+    <p class="note">١٢٠ ثانية · ٦٠ إطاراً في الثانية · مؤثرات صوتية مولّدة عبر Web Audio · اختصارات داخل المشغّل: <kbd>مسافة</kbd> إيقاف/متابعة · <kbd>F</kbd> ملء الشاشة · <kbd>M</kbd> كتم · <kbd>R</kbd> إعادة</p>
+  </div>
+</main>
+
+<!-- ============================ المشغّل ============================ -->
+<section class="view player" id="view-player" hidden>
+  <div class="shell stage-shell" id="stageShell">
+    <div class="hudtop">
+      <div class="fighter">
+        <div class="nm"><span>رين</span><i id="energyA">٩٦٪</i></div>
+        <div class="ebar"><b id="barA" style="width:96%"></b></div>
+      </div>
+      <div class="chapter" id="chapter">هدوء · ٠:٠٠</div>
+      <div class="fighter b">
+        <div class="nm"><span>كورو</span><i id="energyB">٩٦٪</i></div>
+        <div class="ebar b"><b id="barB" style="width:96%"></b></div>
+      </div>
+    </div>
+
+    <div class="stage" id="stage">
+      <canvas id="cv" aria-label="ساحة المعركة"></canvas>
+      <div class="vignette"></div>
+      <div class="scan"></div>
+
+      <div class="fnum" id="fnum">إطار ٠ / ٧٢٠٠</div>
+      <div class="tag" id="tag">٦٠FPS</div>
+      <div class="slowmo" id="slowmo" hidden>٠.٣× · بطيء</div>
+      <div class="impact" id="impact" hidden></div>
+      <div class="sub" id="sub" hidden></div>
+      <div class="titlecard" id="titlecard" hidden></div>
+
+      <div class="pause" id="pause" hidden>
+        <div class="box" style="text-align:center">
+          <h2>إيقاف مؤقت</h2>
+          <p id="pauseInfo">العرض متوقف عند ٠:٠٠</p>
+          <div class="actions">
+            <button class="btn" id="btn_resume">▶ متابعة</button>
+            <button class="btn ghost" id="btn_restart">↺ من البداية</button>
+            <button class="btn ghost" id="btn_home1">⌂ شاشة البداية</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="endcard" id="endcard" hidden>
+        <div class="card">
+          <div class="seal">حسم</div>
+          <h2>انتهت المواجهة</h2>
+          <p class="who">الفائز: <b>رين</b> · بهجوم «فجر مكسور»</p>
+          <div class="stats">
+            <div class="stat"><b id="stTime">٢:٠٠</b><span>المدة</span></div>
+            <div class="stat"><b id="stHits">٢٤</b><span>ضربة</span></div>
+            <div class="stat"><b id="stEnergy">١٨</b><span>هجمة طاقة</span></div>
+            <div class="stat"><b id="stFrames">٩</b><span>إطار تأثير</span></div>
+          </div>
+          <p class="quote">«الفجر لا ينتظر أحداً.»</p>
+          <div class="actions">
+            <button class="btn" id="btn_replay2">↺ أعد المشاهدة</button>
+            <button class="btn ghost" id="btn_last">⏮ اللحظة الأخيرة</button>
+            <button class="btn ghost" id="btn_home2">⌂ شاشة البداية</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom">
+      <div class="seek" id="seek" role="slider" aria-label="شريط التقدم" aria-valuemin="0" aria-valuemax="120" aria-valuenow="0" tabindex="0">
+        <i id="fill2"></i>
+      </div>
+      <div class="marks"><span>٠:٠٠ هدوء</span><span>٠:٢٠ اشتباك</span><span>٠:٤٥ تصعيد</span><span>١:٠٥ ذروة</span><span>١:٣٠ بطيء</span><span>٢:٠٠ سكون</span></div>
+      <div class="controls">
+        <button class="chip solid" id="btn_toggle">⏸ إيقاف مؤقت</button>
+        <button class="chip" id="btn_replay3">↺ إعادة</button>
+        <button class="chip" id="btn_full2">⛶ ملء الشاشة</button>
+        <button class="chip" id="btn_mute2">🔇 كتم</button>
+        <span class="clock" id="clock">٠:٠٠ / ٢:٠٠</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script src="js/audio.js"></script>
+<script src="js/timeline.js"></script>
+<script src="js/timeline2.js"></script>
+<script src="js/render.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
